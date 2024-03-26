@@ -6,9 +6,10 @@ void main() async {
 }
 
 Future<void> gerarRelatorio(List<String> arquivos) async {
+  List<List<String>> conteudos =
+      await Future.wait(arquivos.map((arquivo) => File(arquivo).readAsLines()));
 
-  List<String> conteudos = await Future.wait(arquivos.map((arquivo) => File(arquivo).readAsString()));
-  List<String> linhas = conteudos.map(interpretarArquivo).expand((i) => i).toList();
+  List<String> linhas = conteudos.expand((vals) => vals.skip(1)).toList();
 
   DateTime? dataInicial;
   DateTime? dataFinal;
@@ -22,9 +23,11 @@ Future<void> gerarRelatorio(List<String> arquivos) async {
     }
 
     var [dataString, receitaString, despesaString] = linhaAtual.split(',');
+
     var [year, month, day] = dataString.split('/');
-    
-    DateTime data = DateTime.utc(int.parse(day), int.parse(month), int.parse(year));
+
+    DateTime data =
+        DateTime.utc(int.parse(day), int.parse(month), int.parse(year));
 
     totalReceitas += double.parse(receitaString);
     totalDespesas += double.parse(despesaString);
